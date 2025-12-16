@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Blog Platform</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f4f4;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      transition: 0.3s;
+    }
+    .dark {
+      background: #1e1e1e;
+      color: #eee;
+    }
+    header {
+      background: #007bff;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+    }
+    textarea {
+      width: 50%;
+      height: 300px;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      resize: none;
+    }
+    .preview {
+      width: 50%;
+      background: white;
+      border-radius: 5px;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    button {
+      margin: 5px;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #28a745;
+      color: white;
+    }
+    .post-list {
+      padding: 10px;
+    }
+    .post {
+      border-bottom: 1px solid #ccc;
+      padding: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📝 My Blog</h1>
+    <button onclick="toggleTheme()">🌗 Theme</button>
+  </header>
+
+  <div style="text-align:center;">
+    <input type="text" id="title" placeholder="Post title..." style="width:60%; padding:8px;">
+    <button onclick="savePost()">💾 Save</button>
+  </div>
+
+  <div class="container">
+    <textarea id="content" placeholder="Write your blog in Markdown..."></textarea>
+    <div class="preview" id="preview"></div>
+  </div>
+
+  <div class="post-list" id="posts"></div>
+
+  <script>
+    const content = document.getElementById('content');
+    const preview = document.getElementById('preview');
+    const postsDiv = document.getElementById('posts');
+
+    content.addEventListener('input', () => {
+      preview.innerHTML = content.value.replace(/\n/g, '<br>');
+    });
+
+    function savePost() {
+      const title = document.getElementById('title').value.trim();
+      if (!title) return alert("Please enter a title!");
+
+      const post = { title, body: content.value };
+      let posts = JSON.parse(localStorage.getItem('posts')) || [];
+      posts.push(post);
+      localStorage.setItem('posts', JSON.stringify(posts));
+      loadPosts();
+      alert("✅ Post saved!");
+    }
+
+    function loadPosts() {
+      postsDiv.innerHTML = "<h3>📚 Saved Posts</h3>";
+      let posts = JSON.parse(localStorage.getItem('posts')) || [];
+      posts.forEach((p, i) => {
+        let div = document.createElement('div');
+        div.className = "post";
+        div.innerText = p.title;
+        div.onclick = () => showPost(i);
+        postsDiv.appendChild(div);
+      });
+    }
+
+    function showPost(i) {
+      let posts = JSON.parse(localStorage.getItem('posts')) || [];
+      const post = posts[i];
+      document.getElementById('title').value = post.title;
+      content.value = post.body;
+      preview.innerHTML = post.body.replace(/\n/g, '<br>');
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+    }
+
+    loadPosts();
+  </script>
+
+</body>
+</html>
